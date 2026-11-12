@@ -39,3 +39,4 @@ export const api = createClient<paths>({
 api.use(authMiddleware);
 
 export default api;
+

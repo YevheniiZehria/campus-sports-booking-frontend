@@ -909,3 +909,4 @@ components:
                 type: integer
               rate:
                 type: number
+

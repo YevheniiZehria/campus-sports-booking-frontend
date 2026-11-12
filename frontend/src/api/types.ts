@@ -24,3 +24,4 @@ export type FinancialReport = Schemas["FinancialReport"];
 export type OccupancyReport = Schemas["OccupancyReport"];
 
 export type { paths };
+

@@ -80,3 +80,4 @@ export function mapeazaEroareApi(err: unknown): string {
 
   return "A apărut o problemă de comunicare cu serverul. Te rugăm să reîncerci.";
 }
+

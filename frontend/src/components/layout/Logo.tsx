@@ -20,3 +20,4 @@ export function Logo({ className = "" }: LogoProps) {
 }
 
 export default Logo;
+

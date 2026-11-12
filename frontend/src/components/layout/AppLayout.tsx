@@ -19,3 +19,4 @@ export function AppLayout({ children, user, onLogout }: AppLayoutProps) {
 }
 
 export default AppLayout;
+

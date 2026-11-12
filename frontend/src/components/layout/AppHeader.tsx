@@ -230,3 +230,4 @@ export function AppHeader({ user, onLogout }: AppHeaderProps) {
 }
 
 export default AppHeader;
+
