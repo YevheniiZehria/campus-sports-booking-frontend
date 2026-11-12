@@ -1,0 +1,911 @@
+openapi: 3.1.0
+info:
+  title: Campus Sports Booking API
+  version: 0.1.0
+  description: Contractul OpenAPI pentru platforma de rezervări a bazei sportive USV Suceava
+servers:
+  - url: /api/v1
+    description: Proxy relativ API v1
+
+paths:
+  /auth/register:
+    post:
+      summary: Înregistrare utilizator
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+      responses:
+        '201':
+          description: Utilizator înregistrat cu succes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Date de înregistrare invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Adresa de email există deja
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: Autentificare utilizator
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Autentificare reușită, întoarce token JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Date incorecte de autentificare
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/me:
+    get:
+      summary: Profilul utilizatorului curent
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Datele contului curent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Neautorizat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      summary: Lista utilizatorilor (doar admin)
+      operationId: listUsers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [student, profesor, administrator]
+        - name: isBlocked
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Lista de utilizatori
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+        '403':
+          description: Doar administratorul are acces
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{userId}/unblock:
+    post:
+      summary: Deblocare cont utilizator (doar admin)
+      operationId: unblockUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Utilizator deblocat cu succes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Utilizatorul nu a fost găsit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /resources:
+    get:
+      summary: Lista resurselor sportive
+      operationId: listResources
+      parameters:
+        - name: sport
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [teren, bazin]
+      responses:
+        '200':
+          description: Lista resurselor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceRead'
+    post:
+      summary: Creare resursă nouă (doar admin)
+      operationId: createResource
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceCreate'
+      responses:
+        '201':
+          description: Resursă creată
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceRead'
+        '409':
+          description: Nume duplicat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /resources/{resourceId}:
+    get:
+      summary: Detalii resursă
+      operationId: getResource
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalii resursă
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceRead'
+        '404':
+          description: Resursa nu există
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Modificare resursă (doar admin)
+      operationId: updateResource
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceUpdate'
+      responses:
+        '200':
+          description: Resursă modificată
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceRead'
+        '404':
+          description: Resursa nu există
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Ștergere resursă (doar admin)
+      operationId: deleteResource
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Resursă ștearsă
+        '404':
+          description: Resursa nu există
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /resources/{resourceId}/availability:
+    get:
+      summary: Disponibilitate resursă pe o dată
+      operationId: getResourceAvailability
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Orele și starea lor de disponibilitate
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailabilitySlot'
+
+  /reservations:
+    get:
+      summary: Lista rezervărilor (ale utilizatorului sau toate pentru admin)
+      operationId: listReservations
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de rezervări
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationRead'
+    post:
+      summary: Creare rezervare nouă
+      operationId: createReservation
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationCreate'
+      responses:
+        '201':
+          description: Rezervare creată cu succes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationRead'
+        '400':
+          description: Peste 14 zile în avans sau date invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Limita lunară atinsă (3 rezervări) sau cont blocat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Interval deja ocupat sau blocat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reservations/{reservationId}:
+    get:
+      summary: Detalii rezervare
+      operationId: getReservation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalii rezervare
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationRead'
+        '404':
+          description: Rezervarea nu a fost găsită
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Anulare rezervare (minim 2 ore înainte pt student, oricând pt admin)
+      operationId: cancelReservation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Rezervare anulată
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationRead'
+        '400':
+          description: Nu se poate anula cu mai puțin de 2 ore înainte
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Rezervarea nu există
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reservations/{reservationId}/payment:
+    patch:
+      summary: Actualizare stare plată rezervare (doar admin)
+      operationId: updatePaymentStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentStatusUpdate'
+      responses:
+        '200':
+          description: Stare plată actualizată
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationRead'
+        '403':
+          description: Doar administratorul poate actualiza plata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /maintenance-blocks:
+    get:
+      summary: Lista blocărilor de mentenanță
+      operationId: listMaintenanceBlocks
+      responses:
+        '200':
+          description: Lista de blocări
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MaintenanceBlockRead'
+    post:
+      summary: Adăugare blocare de mentenanță (doar admin)
+      operationId: createMaintenanceBlock
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceBlockCreate'
+      responses:
+        '201':
+          description: Blocare creată
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenanceBlockRead'
+        '403':
+          description: Acces interzis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /maintenance-blocks/{blockId}:
+    delete:
+      summary: Ștergere blocare mentenanță (doar admin)
+      operationId: deleteMaintenanceBlock
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: blockId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Blocare ștearsă
+        '404':
+          description: Blocarea nu a fost găsită
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reports/financial:
+    get:
+      summary: Raport financiar (doar admin)
+      operationId: getFinancialReport
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "2026-11"
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [json, csv, xlsx, pdf]
+            default: json
+      responses:
+        '200':
+          description: Date raport financiar sau fișier descărcabil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinancialReport'
+            text/csv:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /reports/occupancy:
+    get:
+      summary: Raport grad de ocupare (doar admin)
+      operationId: getOccupancyReport
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "2026-11"
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [json, csv, xlsx, pdf]
+            default: json
+      responses:
+        '200':
+          description: Date grad de ocupare
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OccupancyReport'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - detail
+      properties:
+        detail:
+          type: string
+          description: Mesajul de eroare returnat de server
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: ion.popescu@student.usv.ro
+        password:
+          type: string
+          format: password
+          example: ParolaSecreta123!
+
+    UserRegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - fullName
+      properties:
+        email:
+          type: string
+          format: email
+          example: ion.popescu@student.usv.ro
+        password:
+          type: string
+          format: password
+          example: ParolaSecreta123!
+        fullName:
+          type: string
+          example: Ion Popescu
+        phone:
+          type: string
+          example: "0712345678"
+
+    TokenResponse:
+      type: object
+      required:
+        - accessToken
+        - tokenType
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOi...
+        tokenType:
+          type: string
+          example: bearer
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - email
+        - fullName
+        - role
+        - isBlocked
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: ion.popescu@student.usv.ro
+        fullName:
+          type: string
+          example: Ion Popescu
+        role:
+          type: string
+          enum: [student, profesor, administrator]
+          example: student
+        isBlocked:
+          type: boolean
+          example: false
+        cancellationCount:
+          type: integer
+          example: 0
+        noShowCount:
+          type: integer
+          example: 0
+
+    ResourceCreate:
+      type: object
+      required:
+        - name
+        - type
+        - sport
+      properties:
+        name:
+          type: string
+          example: Teren tenis 1
+        type:
+          type: string
+          enum: [teren, bazin]
+          example: teren
+        sport:
+          type: string
+          example: tenis
+        description:
+          type: string
+          nullable: true
+          example: Teren de zgură cu nocturnă
+        pricePerHour:
+          type: number
+          nullable: true
+          example: 40
+        openHour:
+          type: string
+          nullable: true
+          example: "08:00"
+        closeHour:
+          type: string
+          nullable: true
+          example: "22:00"
+
+    ResourceUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [teren, bazin]
+        sport:
+          type: string
+        description:
+          type: string
+          nullable: true
+        pricePerHour:
+          type: number
+          nullable: true
+        openHour:
+          type: string
+          nullable: true
+        closeHour:
+          type: string
+          nullable: true
+
+    ResourceRead:
+      allOf:
+        - $ref: '#/components/schemas/ResourceCreate'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              example: 1
+
+    AvailabilitySlot:
+      type: object
+      required:
+        - startHour
+        - endHour
+        - status
+      properties:
+        startHour:
+          type: integer
+          example: 9
+        endHour:
+          type: integer
+          example: 10
+        status:
+          type: string
+          enum: [liber, ocupat, mentenanta]
+          example: liber
+
+    ReservationCreate:
+      type: object
+      required:
+        - resourceId
+        - start
+        - end
+      properties:
+        resourceId:
+          type: integer
+          example: 1
+        start:
+          type: string
+          format: date-time
+          example: "2026-11-15T09:00:00"
+        end:
+          type: string
+          format: date-time
+          example: "2026-11-15T10:00:00"
+
+    ReservationRead:
+      type: object
+      required:
+        - id
+        - resourceId
+        - start
+        - end
+        - status
+        - paymentStatus
+      properties:
+        id:
+          type: integer
+          example: 101
+        resourceId:
+          type: integer
+          example: 1
+        resourceName:
+          type: string
+          example: Teren tenis 1
+        userId:
+          type: integer
+          example: 42
+        userName:
+          type: string
+          example: Ion Popescu
+        userEmail:
+          type: string
+          example: ion.popescu@student.usv.ro
+        start:
+          type: string
+          format: date-time
+          example: "2026-11-15T09:00:00"
+        end:
+          type: string
+          format: date-time
+          example: "2026-11-15T10:00:00"
+        status:
+          type: string
+          enum: [ACTIVA, ANULATA, FINALIZATA, NEPREZENTARE]
+          example: ACTIVA
+        paymentStatus:
+          type: string
+          enum: [ACHITATA, NEACHITATA]
+          example: NEACHITATA
+        totalPrice:
+          type: number
+          nullable: true
+          example: 40
+        createdAt:
+          type: string
+          format: date-time
+
+    PaymentStatusUpdate:
+      type: object
+      required:
+        - paymentStatus
+      properties:
+        paymentStatus:
+          type: string
+          enum: [ACHITATA, NEACHITATA]
+          example: ACHITATA
+
+    MaintenanceBlockCreate:
+      type: object
+      required:
+        - resourceId
+        - start
+        - end
+      properties:
+        resourceId:
+          type: integer
+          example: 1
+        start:
+          type: string
+          format: date-time
+          example: "2026-11-14T08:00:00"
+        end:
+          type: string
+          format: date-time
+          example: "2026-11-14T12:00:00"
+        reason:
+          type: string
+          nullable: true
+          example: Lucrări de refacere suprafață de joc
+
+    MaintenanceBlockRead:
+      allOf:
+        - $ref: '#/components/schemas/MaintenanceBlockCreate'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              example: 5
+            resourceName:
+              type: string
+              example: Teren tenis 1
+
+    FinancialReport:
+      type: object
+      properties:
+        month:
+          type: string
+          example: "2026-11"
+        totalRevenue:
+          type: number
+          example: 4500
+        paidCount:
+          type: integer
+          example: 95
+        unpaidCount:
+          type: integer
+          example: 12
+        breakdownBySport:
+          type: array
+          items:
+            type: object
+            properties:
+              sport:
+                type: string
+              revenue:
+                type: number
+              count:
+                type: integer
+
+    OccupancyReport:
+      type: object
+      properties:
+        month:
+          type: string
+          example: "2026-11"
+        overallRate:
+          type: number
+          example: 78.5
+        slotsBySport:
+          type: array
+          items:
+            type: object
+            properties:
+              sport:
+                type: string
+              totalSlots:
+                type: integer
+              bookedSlots:
+                type: integer
+              rate:
+                type: number
