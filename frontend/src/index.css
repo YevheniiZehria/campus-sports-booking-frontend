@@ -1,33 +1,34 @@
 @import "tailwindcss";
 
-/* Temă de culori și variabile vizuale - USV Sport */
+/* ───── Temă vizuală USV Sport & Design System ───── */
 @layer base {
   :root {
-    --background: #f4f6fa;
-    --foreground: #101828;
+    --background: #f8fafc;
+    --foreground: #0f172a;
 
     --card: #ffffff;
-    --card-foreground: #101828;
+    --card-foreground: #0f172a;
 
     --popover: #ffffff;
-    --popover-foreground: #101828;
+    --popover-foreground: #0f172a;
 
     --primary: #0b5cad;
+    --primary-hover: #094b8f;
     --primary-foreground: #ffffff;
 
-    --secondary: #eef2f6;
+    --secondary: #f1f5f9;
     --secondary-foreground: #1e293b;
 
-    --muted: #f1f5f9;
+    --muted: #f8fafc;
     --muted-foreground: #64748b;
 
-    --accent: #e8f1fa;
-    --accent-foreground: #0b5cad;
+    --accent: #e0f2fe;
+    --accent-foreground: #0369a1;
 
     --destructive: #ef4444;
     --destructive-foreground: #ffffff;
 
-    --success: #16a34a;
+    --success: #10b981;
     --success-foreground: #ffffff;
 
     --warning: #f59e0b;
@@ -43,8 +44,26 @@
 
 body {
   margin: 0;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   background-color: var(--background);
   color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Efecte grafice și animații discrete */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #0b5cad 0%, #034078 60%, #002244 100%);
+}
+
+.chip-active {
+  background-color: #0b5cad;
+  color: #ffffff;
+  box-shadow: 0 2px 6px -1px rgba(11, 92, 173, 0.35);
+}
