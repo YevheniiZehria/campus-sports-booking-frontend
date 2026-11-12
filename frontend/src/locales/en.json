@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "USV Sport",
+    "subtitle": "Campus Sports Booking",
+    "footer": "© 2026 USV Sport · Stefan cel Mare University Sports Complex",
+    "regulations": "Regulations",
+    "contact": "Contact"
+  },
+  "nav": {
+    "facilities": "Facilities",
+    "book": "Book",
+    "myBookings": "My Bookings",
+    "admin": "Admin Panel",
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Log Out"
+  },
+  "roles": {
+    "student": "Student",
+    "studentBadge": "Student · max 3 bookings / month",
+    "profesor": "Faculty",
+    "administrator": "Administrator"
+  },
+  "status": {
+    "activa": "Confirmed",
+    "anulata": "Cancelled",
+    "finalizata": "Completed",
+    "neprezentare": "No-show",
+    "achitata": "Paid",
+    "neachitata": "Unpaid",
+    "liber": "Available",
+    "ocupat": "Booked",
+    "mentenanta": "Maintenance",
+    "selectat": "Selected"
+  }
+}
