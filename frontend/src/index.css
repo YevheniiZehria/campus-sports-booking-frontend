@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+/* Temă de culori și variabile vizuale - USV Sport */
+@layer base {
+  :root {
+    --background: #f4f6fa;
+    --foreground: #101828;
+
+    --card: #ffffff;
+    --card-foreground: #101828;
+
+    --popover: #ffffff;
+    --popover-foreground: #101828;
+
+    --primary: #0b5cad;
+    --primary-foreground: #ffffff;
+
+    --secondary: #eef2f6;
+    --secondary-foreground: #1e293b;
+
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+
+    --accent: #e8f1fa;
+    --accent-foreground: #0b5cad;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --success: #16a34a;
+    --success-foreground: #ffffff;
+
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
+
+    --border: #e2e8f0;
+    --input: #cbd5e1;
+    --ring: #0b5cad;
+
+    --radius: 0.75rem;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+

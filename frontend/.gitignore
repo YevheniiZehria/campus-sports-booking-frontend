@@ -1,0 +1,20 @@
+# Dependențe
+node_modules/
+
+# Build
+dist/
+dist-ssr/
+*.local
+
+# Cache și TypeScript
+.vite/
+*.tsbuildinfo
+
+# Teste & coverage
+coverage/
+test-results/
+playwright-report/
+
+# Mediu
+.env
+.env.*.local
